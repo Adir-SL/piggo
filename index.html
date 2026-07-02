@@ -819,6 +819,8 @@
       card.classList.toggle('checked', checked);
       const btn = card.querySelector('.check-btn');
       if (btn) btn.setAttribute('aria-pressed', checked);
+      const refDot = card.querySelector('.dot.ref-done, .dot.ref-open');
+      if (refDot) refDot.className = `dot ${checked ? 'ref-done' : 'ref-open'}`;
     }
   }
 
