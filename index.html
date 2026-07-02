@@ -95,6 +95,7 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
+      padding-bottom: 8px;
       transition: color 0.15s;
       -webkit-tap-highlight-color: transparent;
       letter-spacing: 0.03em;
@@ -778,6 +779,7 @@
   function load() {
     try { habits = JSON.parse(localStorage.getItem('piggo_habits')) || []; }
     catch { habits = []; }
+    viewMode = localStorage.getItem('piggo_view') || 'list';
   }
 
   function save() {
@@ -983,6 +985,7 @@
   /* ── View switching ─────────────────────────────── */
   function setView(v) {
     viewMode = v;
+    localStorage.setItem('piggo_view', v);
     document.getElementById('vList').style.display    = v === 'list' ? '' : 'none';
     document.getElementById('vCal').style.display     = v === 'cal'  ? '' : 'none';
     document.getElementById('jNewHabit').style.display = v === 'list' ? '' : 'none';
@@ -1195,7 +1198,7 @@
   load();
   renderEmojis();
   renderColors();
-  setView('list');
+  setView(viewMode);
 </script>
 </body>
 </html>
