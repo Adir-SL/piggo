@@ -1201,6 +1201,31 @@
     renderColors();
   });
 
+  /* ── Swipe gestures ─────────────────────────────── */
+  function addSwipe(el, onLeft, onRight) {
+    let sx = 0, sy = 0;
+    el.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      dx < 0 ? onLeft() : onRight();
+    }, { passive: true });
+  }
+
+  addSwipe(document.getElementById('vList'),
+    () => { const d = parseDate(selectedDate); d.setDate(d.getDate() + 1); selectedDate = dkey(d); renderList(); },
+    () => { const d = parseDate(selectedDate); d.setDate(d.getDate() - 1); selectedDate = dkey(d); renderList(); }
+  );
+
+  addSwipe(document.querySelector('.cal-wrap'),
+    () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); },
+    () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+  );
+
   /* ── Init ───────────────────────────────────────── */
   load();
   renderEmojis();
