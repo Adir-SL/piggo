@@ -899,7 +899,7 @@
       }).join('');
 
       const accentColor = h.color || COLORS[0];
-      return `<div class="card${checked ? ' checked' : ''}" data-id="${h.id}" style="box-shadow: inset 4px 0 0 ${accentColor}; --habit-color: ${accentColor}">
+      return `<div class="card${checked ? ' checked' : ''}" data-id="${h.id}" style="border-color: ${accentColor}; --habit-color: ${accentColor}">
         <div class="card-top">
           <button class="check-btn" data-action="check" aria-label="Toggle ${h.name}" aria-pressed="${checked}">
             <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
