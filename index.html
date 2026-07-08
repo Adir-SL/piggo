@@ -225,25 +225,7 @@
     .hstreak { margin-top: 3px; font-size: 12px; font-weight: 600; color: var(--go); }
     .hstreak.cold { color: var(--muted); font-weight: 400; }
 
-    .edit-btn {
-      flex-shrink: 0;
-      width: 34px;
-      height: 34px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      opacity: 0.4;
-      transition: color 0.12s, opacity 0.12s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .edit-btn:active { color: var(--pig); opacity: 1; }
-
-    .delete-habit-btn {
+.delete-habit-btn {
       width: 100%;
       padding: 13px;
       margin-top: 6px;
@@ -918,11 +900,6 @@
             <div class="hname"><span class="hem">${h.emoji}</span>${h.name}</div>
             ${streakHTML}
           </div>
-          <button class="edit-btn" data-action="edit" aria-label="Edit ${h.name}">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9.5 2l2.5 2.5-7 7H2.5V9L9.5 2z"/>
-            </svg>
-          </button>
         </div>
         <div class="dots">${dots}</div>
       </div>`;
@@ -1064,8 +1041,7 @@
       toggle(id);
       const btn = document.querySelector(`.card[data-id="${id}"] .check-btn`);
       if (btn) { btn.classList.remove('popping'); void btn.offsetWidth; btn.classList.add('popping'); }
-    }
-    if (e.target.closest('[data-action="edit"]')) {
+    } else {
       openSheet(id);
     }
   });
