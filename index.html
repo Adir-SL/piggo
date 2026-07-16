@@ -54,6 +54,32 @@
       gap: 10px;
     }
 
+    .streak-toggle-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surf);
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      filter: grayscale(1);
+    }
+    .streak-toggle-btn:active { background: var(--raised); }
+    .streak-toggle-btn.on {
+      background: rgba(255,184,77,0.15);
+      border-color: var(--go);
+      filter: grayscale(0);
+    }
+
+    body.no-streaks .hstreak,
+    body.no-streaks .cal-streak-num { display: none; }
+
     .logo {
       font-size: 26px;
       font-weight: 800;
@@ -361,6 +387,26 @@
       font-family: inherit;
     }
 
+    .cal-ec { position: relative; }
+    .cal-streak-num {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--go);
+      color: #1E1C19;
+      font-size: 10px;
+      font-weight: 800;
+      font-family: inherit;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg);
+      line-height: 1;
+    }
+
 
     /* ── Sheet ───────────────────────────────────── */
     .backdrop {
@@ -593,12 +639,15 @@
 <!-- ── Header ──────────────────────────────────── -->
 <header>
   <div class="logo" aria-label="piggo"><span class="pig">pig</span><span class="go">go</span></div>
+  <div style="display:flex;align-items:center;gap:8px;">
   <button class="new-habit-btn" id="jNewHabit">
     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
       <line x1="5.5" y1="1" x2="5.5" y2="10"/><line x1="1" y1="5.5" x2="10" y2="5.5"/>
     </svg>
     New habit
   </button>
+  <button class="streak-toggle-btn" id="jStreakToggle" aria-label="Toggle streaks" title="Toggle streaks">🔥</button>
+  </div>
 </header>
 
 <!-- ── LIST VIEW ───────────────────────────────── -->
@@ -785,6 +834,20 @@
     localStorage.setItem('piggo_habits', JSON.stringify(habits));
   }
 
+  /* ── Streak visibility ──────────────────────────── */
+  let showStreaks = localStorage.getItem('piggo_streaks') !== 'false';
+
+  function applyStreaks() {
+    document.body.classList.toggle('no-streaks', !showStreaks);
+    document.getElementById('jStreakToggle').classList.toggle('on', showStreaks);
+  }
+
+  document.getElementById('jStreakToggle').addEventListener('click', () => {
+    showStreaks = !showStreaks;
+    localStorage.setItem('piggo_streaks', showStreaks);
+    applyStreaks();
+  });
+
   /* ── Streak (always relative to today) ─────────── */
   function streak(habit) {
     const set = new Set(habit.completions);
@@ -792,6 +855,16 @@
     if (!set.has(dkey(d))) d.setDate(d.getDate() - 1);
     let n = 0;
     while (set.has(dkey(d))) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  function streakOnDate(habit, dateKey) {
+    const set = new Set(habit.completions);
+    if (!set.has(dateKey)) return 0;
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const cur = new Date(y, m - 1, d);
+    let n = 0;
+    while (set.has(dkey(cur))) { n++; cur.setDate(cur.getDate() - 1); }
     return n;
   }
 
@@ -956,8 +1029,11 @@
         const COL_MAX = 3;
         const showCount = doneHabits.length > COL_MAX ? COL_MAX - 1 : doneHabits.length;
         const extra = doneHabits.length - showCount;
-        let items = doneHabits.slice(0, showCount)
-          .map(h => `<div class="cal-ec" style="background:${h.color || COLORS[0]}"><span style="display:block;transform:translateY(1px)">${h.emoji}</span></div>`).join('');
+        let items = doneHabits.slice(0, showCount).map(h => {
+          const s = streakOnDate(h, k);
+          const badge = s >= 2 ? `<div class="cal-streak-num">${s}</div>` : '';
+          return `<div class="cal-ec" style="background:${h.color || COLORS[0]}">${badge}<span style="display:block;transform:translateY(1px)">${h.emoji}</span></div>`;
+        }).join('');
         if (extra > 0) items += `<div class="cal-ec cal-more">+${extra}</div>`;
         emojisHTML = `<div class="cal-emojis">${items}</div>`;
       }
@@ -1239,6 +1315,7 @@
   load();
   renderEmojis();
   renderColors();
+  applyStreaks();
   setView(viewMode);
 </script>
 </body>
